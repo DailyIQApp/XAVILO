@@ -1,0 +1,854 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10111b">
+<title>XAVILO | Gaming Universe</title>
+
+<style>
+:root {
+  --bg:#10111b;
+  --panel:#1c1e2e;
+  --panel2:#25283b;
+  --accent:#a78bfa;
+  --text:#ffffff;
+  --muted:#aaaac0;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+}
+
+button,input { font:inherit; }
+
+header {
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#191a29;
+  border-bottom:1px solid #303247;
+  padding:17px 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo {
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:4px;
+  color:var(--accent);
+}
+
+nav {
+  display:flex;
+  gap:22px;
+}
+
+nav a {
+  color:#ddd;
+  text-decoration:none;
+  font-size:14px;
+}
+
+nav a:hover { color:var(--accent); }
+
+.hero {
+  text-align:center;
+  padding:65px 15px 35px;
+  background:radial-gradient(ellipse at top,#39305b,#10111b 72%);
+}
+
+.hero h1 {
+  font-size:clamp(34px,6vw,58px);
+  margin:0 0 15px;
+  letter-spacing:2px;
+}
+
+.hero h1 span { color:var(--accent); }
+
+.hero p { color:var(--muted); }
+
+.search {
+  display:block;
+  width:90%;
+  max-width:520px;
+  padding:16px;
+  margin:27px auto 12px;
+  background:#222438;
+  border:1px solid #45465e;
+  border-radius:13px;
+  color:white;
+  outline:none;
+}
+
+.search:focus { border-color:var(--accent); }
+
+main {
+  max-width:1200px;
+  margin:auto;
+  padding:35px 22px;
+}
+
+.heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+
+.heading span {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.categories {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:28px;
+}
+
+.category {
+  padding:11px 18px;
+  background:var(--panel2);
+  color:white;
+  border:1px solid #41435b;
+  border-radius:30px;
+  cursor:pointer;
+}
+
+.category.active {
+  background:#8068dc;
+  border-color:#8068dc;
+}
+
+.games {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;
+}
+
+.card {
+  background:var(--panel);
+  border:1px solid #34364b;
+  border-radius:17px;
+  overflow:hidden;
+  transition:.2s;
+}
+
+.card:hover {
+  transform:translateY(-4px);
+  border-color:var(--accent);
+}
+
+.art {
+  height:155px;
+  display:grid;
+  place-items:center;
+  font-size:65px;
+  background:linear-gradient(135deg,#40345f,#252b48);
+}
+
+.content { padding:18px; }
+
+.content h3 { margin:0 0 10px; }
+
+.content p {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+  min-height:38px;
+}
+
+.actions {
+  display:flex;
+  gap:8px;
+  margin-top:15px;
+}
+
+.play {
+  flex:1;
+  padding:13px 8px;
+  background:#9278ee;
+  color:white;
+  border:0;
+  border-radius:9px;
+  text-decoration:none;
+  text-align:center;
+  font-weight:bold;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.play:hover { background:#a995ff; }
+
+.favourite {
+  background:#303148;
+  color:white;
+  border:0;
+  border-radius:9px;
+  padding:0 13px;
+  font-size:21px;
+  cursor:pointer;
+}
+
+.favourite.selected { color:#ff82b5; }
+
+.empty {
+  display:none;
+  text-align:center;
+  padding:35px;
+  color:var(--muted);
+}
+
+footer {
+  text-align:center;
+  padding:35px;
+  background:#191a29;
+  color:#888;
+  margin-top:45px;
+}
+
+/* FULLSCREEN GAME PLAYER */
+
+#player {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:#10111b;
+  padding:15px;
+  overflow:auto;
+}
+
+#player:fullscreen {
+  width:100%;
+  height:100%;
+  padding:20px;
+  background:#10111b;
+}
+
+.player-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.player-buttons {
+  display:flex;
+  gap:8px;
+}
+
+.player-buttons button {
+  border:0;
+  background:#303249;
+  color:white;
+  border-radius:9px;
+  padding:12px 15px;
+  cursor:pointer;
+}
+
+#gameArea {
+  max-width:700px;
+  margin:35px auto;
+  text-align:center;
+  background:#1c1e2e;
+  border:1px solid #41435b;
+  border-radius:20px;
+  padding:30px 18px;
+}
+
+#gameArea button {
+  border:0;
+  background:#9278ee;
+  color:white;
+  padding:13px 20px;
+  margin:6px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+#gameArea .big {
+  font-size:30px;
+  padding:25px 40px;
+}
+
+#gameArea .game-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  max-width:380px;
+  margin:20px auto;
+}
+
+#gameArea .memory-card {
+  aspect-ratio:1;
+  font-size:26px;
+  padding:5px;
+}
+
+#gameArea .board {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  max-width:330px;
+  margin:20px auto;
+}
+
+#gameArea .cell {
+  aspect-ratio:1;
+  font-size:32px;
+}
+
+#gameArea .score {
+  font-size:22px;
+  margin:20px;
+  color:#c3b3ff;
+}
+
+#gameArea .instruction {
+  color:var(--muted);
+  line-height:1.6;
+}
+
+@media(max-width:850px) {
+  .games { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media(max-width:520px) {
+  header { padding:15px; }
+  .logo { font-size:23px; }
+  nav { gap:12px; }
+  nav a { font-size:12px; }
+  .hero { padding:48px 12px 25px; }
+  main { padding:25px 13px; }
+  .games { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+  .art { height:110px; font-size:45px; }
+  .content { padding:11px; }
+  .content h3 { font-size:15px; }
+  .content p { font-size:12px; }
+  .play { font-size:10px; padding:12px 5px; }
+  .favourite { padding:0 9px; }
+  #gameArea { padding:20px 10px; }
+}
+
+@media(max-width:360px) {
+  .games { grid-template-columns:1fr; }
+}
+
+button:focus-visible,a:focus-visible,input:focus-visible {
+  outline:2px solid #c5b5ff;
+  outline-offset:3px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">XAVILO.</div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#games">Games</a>
+    <a href="#favourites">Favourites</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h1>PLAY WITHOUT <span>LIMITS.</span></h1>
+  <p>Your gaming universe starts here.</p>
+
+  <input class="search" id="search"
+    placeholder="🔍 Search games..."
+    aria-label="Search games">
+</section>
+
+<main id="games">
+
+  <div class="heading">
+    <h2>🎮 Game Library</h2>
+    <span id="count">6 games</span>
+  </div>
+
+  <div class="categories">
+    <button class="category active" data-filter="all">All</button>
+    <button class="category" data-filter="popular">Popular</button>
+    <button class="category" data-filter="racing">Racing</button>
+    <button class="category" data-filter="arcade">Arcade</button>
+    <button class="category" data-filter="favourite">♥ Favourites</button>
+  </div>
+
+  <div class="games" id="gameList">
+
+    <article class="card" data-name="roblox" data-category="popular">
+      <div class="art">🎮</div>
+      <div class="content">
+        <h3>Roblox</h3>
+        <p>Explore millions of experiences on the real Roblox platform.</p>
+        <div class="actions">
+          <a class="play" href="https://www.roblox.com/"
+             target="_blank" rel="noopener">PLAY ↗</a>
+          <button class="favourite" aria-label="Favourite Roblox">♡</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" data-name="smash karts" data-category="racing">
+      <div class="art">🏎️</div>
+      <div class="content">
+        <h3>Smash Karts</h3>
+        <p>Enjoy multiplayer kart racing and arena battles.</p>
+        <div class="actions">
+          <a class="play" href="https://smashkarts.io/"
+             target="_blank" rel="noopener">PLAY ↗</a>
+          <button class="favourite" aria-label="Favourite Smash Karts">♡</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" data-name="click rush" data-category="arcade">
+      <div class="art">⚡</div>
+      <div class="content">
+        <h3>Click Rush</h3>
+        <p>How many times can you click in 15 seconds?</p>
+        <div class="actions">
+          <button class="play" onclick="openGame('click')">PLAY NOW</button>
+          <button class="favourite" aria-label="Favourite Click Rush">♡</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" data-name="tic tac toe" data-category="arcade">
+      <div class="art">⭕</div>
+      <div class="content">
+        <h3>Tic Tac Toe</h3>
+        <p>Challenge a friend to the classic game.</p>
+        <div class="actions">
+          <button class="play" onclick="openGame('tic')">PLAY NOW</button>
+          <button class="favourite" aria-label="Favourite Tic Tac Toe">♡</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" data-name="memory match" data-category="arcade">
+      <div class="art">🧠</div>
+      <div class="content">
+        <h3>Memory Match</h3>
+        <p>Find all matching pairs of cards.</p>
+        <div class="actions">
+          <button class="play" onclick="openGame('memory')">PLAY NOW</button>
+          <button class="favourite" aria-label="Favourite Memory Match">♡</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" data-name="reaction test" data-category="arcade">
+      <div class="art">🎯</div>
+      <div class="content">
+        <h3>Reaction Test</h3>
+        <p>Test how quickly you react to a signal.</p>
+        <div class="actions">
+          <button class="play" onclick="openGame('reaction')">PLAY NOW</button>
+          <button class="favourite" aria-label="Favourite Reaction Test">♡</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="empty" id="empty">
+    No games found. Try another search!
+  </div>
+
+</main>
+
+<footer id="favourites">
+  <strong style="color:#b6a0ff">XAVILO.</strong>
+  <p style="margin-top:10px">Your gaming universe. Made for gamers.</p>
+  <p style="margin-top:8px">© 2026 XAVILO</p>
+</footer>
+
+<!-- FULLSCREEN PLAYER -->
+
+<section id="player" aria-label="Game player">
+  <div class="player-top">
+    <h2 id="gameTitle">Game</h2>
+    <div class="player-buttons">
+      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button onclick="closeGame()">✕ Exit</button>
+    </div>
+  </div>
+  <div id="gameArea"></div>
+</section>
+
+<script>
+const search = document.getElementById("search");
+const cards = [...document.querySelectorAll(".card")];
+const categoryButtons = document.querySelectorAll(".category");
+
+let category = "all";
+let activeGame = "";
+let gameTimer = null;
+let reactionTimer = null;
+let reactionStarted = 0;
+let ticBoard = ["","","","","","","","",""];
+let ticTurn = "X";
+let memoryCards = [];
+let memoryOpen = [];
+let memoryMatched = [];
+let clickScore = 0;
+let clickTime = 15;
+
+function getFavourites() {
+  try {
+    return JSON.parse(localStorage.getItem("xavilo-favourites")) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+let favourites = getFavourites();
+
+function saveFavourites() {
+  try {
+    localStorage.setItem("xavilo-favourites",JSON.stringify(favourites));
+  } catch(e) {}
+}
+
+function updateFavouriteButtons() {
+  cards.forEach(card => {
+    const button = card.querySelector(".favourite");
+    const selected = favourites.includes(card.dataset.name);
+    button.classList.toggle("selected",selected);
+    button.textContent = selected ? "♥" : "♡";
+  });
+}
+
+document.querySelectorAll(".favourite").forEach(button => {
+  button.addEventListener("click",() => {
+    const name = button.closest(".card").dataset.name;
+    favourites = favourites.includes(name)
+      ? favourites.filter(item => item !== name)
+      : [...favourites,name];
+
+    saveFavourites();
+    updateFavouriteButtons();
+    filterGames();
+  });
+});
+
+function filterGames() {
+  const query = search.value.toLowerCase();
+  let count = 0;
+
+  cards.forEach(card => {
+    const nameMatch = card.dataset.name.includes(query);
+    const categoryMatch =
+      category === "all" ||
+      card.dataset.category === category ||
+      (category === "favourite" && favourites.includes(card.dataset.name));
+
+    const show = nameMatch && categoryMatch;
+    card.style.display = show ? "block" : "none";
+    if(show) count++;
+  });
+
+  document.getElementById("count").textContent =
+    count + (count === 1 ? " game" : " games");
+
+  document.getElementById("empty").style.display =
+    count ? "none" : "block";
+}
+
+search.addEventListener("input",filterGames);
+
+categoryButtons.forEach(button => {
+  button.addEventListener("click",() => {
+    categoryButtons.forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    category = button.dataset.filter;
+    filterGames();
+  });
+});
+
+updateFavouriteButtons();
+
+function openGame(type) {
+  clearInterval(gameTimer);
+  clearTimeout(reactionTimer);
+  activeGame = type;
+
+  const player = document.getElementById("player");
+  const area = document.getElementById("gameArea");
+
+  player.style.display = "block";
+  document.body.style.overflow = "hidden";
+
+  if(type === "click") {
+    document.getElementById("gameTitle").textContent = "⚡ Click Rush";
+    clickScore = 0;
+    clickTime = 15;
+
+    area.innerHTML = `
+      <h2>CLICK RUSH!</h2>
+      <p class="instruction">Tap as many times as you can in 15 seconds.</p>
+      <div class="score" id="clickScore">Score: 0</div>
+      <div class="score" id="clickTime">Time: 15</div>
+      <button class="big" id="clickButton" disabled>+</button>
+      <p id="clickMessage">Press START to begin!</p>
+      <button id="clickStart">START GAME</button>
+    `;
+
+    document.getElementById("clickStart").onclick = startClickGame;
+    document.getElementById("clickButton").onclick = () => {
+      if(clickTime <= 0) return;
+      clickScore++;
+      document.getElementById("clickScore").textContent = "Score: " + clickScore;
+    };
+  }
+
+  if(type === "tic") {
+    document.getElementById("gameTitle").textContent = "⭕ Tic Tac Toe";
+    ticBoard = ["","","","","","","","",""];
+    ticTurn = "X";
+    renderTic();
+  }
+
+  if(type === "memory") {
+    document.getElementById("gameTitle").textContent = "🧠 Memory Match";
+    startMemory();
+  }
+
+  if(type === "reaction") {
+    document.getElementById("gameTitle").textContent = "🎯 Reaction Test";
+    area.innerHTML = `
+      <h2>REACTION TEST</h2>
+      <p class="instruction">Press START. Wait until the screen turns green, then tap!</p>
+      <div id="reactionBox" style="padding:55px 10px;background:#38334e;border-radius:15px;margin:25px 0">
+        Ready?
+      </div>
+      <button id="reactionStart">START</button>
+      <p id="reactionResult" class="score"></p>
+    `;
+    document.getElementById("reactionStart").onclick = startReaction;
+  }
+}
+
+function startClickGame() {
+  clearInterval(gameTimer);
+  clickScore = 0;
+  clickTime = 15;
+  document.getElementById("clickScore").textContent = "Score: 0";
+  document.getElementById("clickTime").textContent = "Time: 15";
+  document.getElementById("clickMessage").textContent = "GO!";
+  document.getElementById("clickButton").disabled = false;
+
+  gameTimer = setInterval(() => {
+    clickTime--;
+    document.getElementById("clickTime").textContent = "Time: " + clickTime;
+
+    if(clickTime <= 0) {
+      clearInterval(gameTimer);
+      document.getElementById("clickButton").disabled = true;
+      document.getElementById("clickMessage").textContent =
+        "Time's up! Your score: " + clickScore;
+    }
+  },1000);
+}
+
+function renderTic() {
+  const area = document.getElementById("gameArea");
+  area.innerHTML = `
+    <h2>TIC TAC TOE</h2>
+    <p id="ticStatus" class="score">Player X's turn</p>
+    <div class="board">
+      ${ticBoard.map((v,i) =>
+        `<button class="cell" data-cell="${i}">${v}</button>`
+      ).join("")}
+    </div>
+    <button id="ticReset">NEW GAME</button>
+  `;
+
+  area.querySelectorAll("[data-cell]").forEach(button => {
+    button.onclick = () => {
+      const i = Number(button.dataset.cell);
+      if(ticBoard[i] || checkWinner()) return;
+      ticBoard[i] = ticTurn;
+
+      if(checkWinner()) {
+        renderTic();
+        document.getElementById("ticStatus").textContent =
+          "Player " + ticTurn + " wins!";
+      } else if(ticBoard.every(Boolean)) {
+        renderTic();
+        document.getElementById("ticStatus").textContent = "It's a draw!";
+      } else {
+        ticTurn = ticTurn === "X" ? "O" : "X";
+        renderTic();
+      }
+    };
+  });
+
+  document.getElementById("ticReset").onclick = () => {
+    ticBoard = ["","","","","","","","",""];
+    ticTurn = "X";
+    renderTic();
+  };
+}
+
+function checkWinner() {
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  return wins.some(([a,b,c]) =>
+    ticBoard[a] && ticBoard[a] === ticBoard[b] &&
+    ticBoard[a] === ticBoard[c]
+  );
+}
+
+function startMemory() {
+  const emojis = ["🐸","🌸","🚀","🍕","🐱","⭐","🎮","🦋"];
+  memoryCards = [...emojis,...emojis].sort(() => Math.random()-.5);
+  memoryOpen = [];
+  memoryMatched = [];
+  renderMemory();
+}
+
+function renderMemory() {
+  const area = document.getElementById("gameArea");
+  area.innerHTML = `
+    <h2>MEMORY MATCH</h2>
+    <p class="instruction">Find all eight matching pairs!</p>
+    <div class="game-grid">
+      ${memoryCards.map((emoji,i) =>
+        `<button class="memory-card" data-memory="${i}">
+          ${memoryMatched.includes(i) || memoryOpen.includes(i) ? emoji : "?"}
+        </button>`
+      ).join("")}
+    </div>
+    <p class="score">Pairs: ${memoryMatched.length/2}/8</p>
+    <button id="memoryReset">RESTART</button>
+    <p id="memoryMessage"></p>
+  `;
+
+  area.querySelectorAll("[data-memory]").forEach(button => {
+    button.onclick = () => {
+      const i = Number(button.dataset.memory);
+      if(memoryOpen.length === 2 ||
+         memoryOpen.includes(i) ||
+         memoryMatched.includes(i)) return;
+
+      memoryOpen.push(i);
+      renderMemory();
+
+      if(memoryOpen.length === 2) {
+        const [a,b] = memoryOpen;
+        if(memoryCards[a] === memoryCards[b]) {
+          memoryMatched.push(a,b);
+          memoryOpen = [];
+          renderMemory();
+          if(memoryMatched.length === 16) {
+            document.querySelector("#gameArea .score").textContent =
+              "Amazing! You found every pair!";
+          }
+        } else {
+          gameTimer = setTimeout(() => {
+            memoryOpen = [];
+            renderMemory();
+          },800);
+        }
+      }
+    };
+  });
+
+  document.getElementById("memoryReset").onclick = startMemory;
+}
+
+function startReaction() {
+  clearTimeout(reactionTimer);
+  const box = document.getElementById("reactionBox");
+  const result = document.getElementById("reactionResult");
+  box.style.background = "#38334e";
+  box.textContent = "Wait for green...";
+  result.textContent = "";
+
+  const delay = 1500 + Math.random()*3000;
+
+  reactionTimer = setTimeout(() => {
+    if(activeGame !== "reaction") return;
+    reactionStarted = performance.now();
+    box.style.background = "#168d62";
+    box.textContent = "TAP NOW!";
+  },delay);
+
+  box.onclick = () => {
+    if(!reactionStarted) {
+      clearTimeout(reactionTimer);
+      box.textContent = "Too early! Try again.";
+      result.textContent = "Wait for green next time.";
+      return;
+    }
+
+    const elapsed = Math.round(performance.now()-reactionStarted);
+    reactionStarted = 0;
+    box.textContent = "Finished!";
+    result.textContent = "Your reaction: " + elapsed + " ms";
+  };
+}
+
+async function toggleFullscreen() {
+  const player = document.getElementById("player");
+
+  try {
+    if(!document.fullscreenElement) {
+      if(player.requestFullscreen) {
+        await player.requestFullscreen();
+      } else {
+        alert("Fullscreen is not supported by this browser.");
+      }
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch(e) {
+    alert("Fullscreen could not be started. Try your browser's fullscreen controls.");
+  }
+}
+
+function closeGame() {
+  clearInterval(gameTimer);
+  clearTimeout(gameTimer);
+  clearTimeout(reactionTimer);
+  reactionStarted = 0;
+  activeGame = "";
+
+  if(document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+
+  document.getElementById("player").style.display = "none";
+  document.body.style.overflow = "";
+}
+
+document.addEventListener("fullscreenchange",() => {
+  const player = document.getElementById("player");
+  if(!document.fullscreenElement && player.style.display === "block") {
+    // The game remains open; use EXIT to return to the library.
+  }
+});
+</script>
+
+</body>
+</html>
